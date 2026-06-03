@@ -313,11 +313,26 @@ button{
 
 
 
-<input type="text" id="amount" placeholder="Principal Amount" oninput="formatAmount(this)">
+<input
+type="text"
+id="amount"
+placeholder="Principal Amount"
+inputmode="numeric"
+oninput="this.value=this.value.replace(/[^0-9]/g,''); formatAmount(this);">
 
-<input type="number" id="rate" placeholder="Interest Rate (%)">
+<input
+type="text"
+id="rate"
+placeholder="Interest Rate (%)"
+inputmode="decimal"
+oninput="this.value=this.value.replace(/[^0-9.]/g,'')">
 
-<input type="number" id="time" placeholder="Time (Months)">
+<input
+type="text"
+id="time"
+placeholder="Time (Months)"
+inputmode="numeric"
+oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 
 <div class="btn-group">
 
@@ -348,6 +363,24 @@ Results will appear here...
 </div>
 
 <script>
+
+document.getElementById("amount").addEventListener("keypress", function(e){
+    if(!/[0-9]/.test(e.key)){
+        e.preventDefault();
+    }
+});
+
+document.getElementById("rate").addEventListener("keypress", function(e){
+    if(!/[0-9.]/.test(e.key)){
+        e.preventDefault();
+    }
+});
+
+document.getElementById("time").addEventListener("keypress", function(e){
+    if(!/[0-9]/.test(e.key)){
+        e.preventDefault();
+    }
+});
 
 let reportText="";
 
