@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VELINO VADDI Calculator Pro</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+:root{
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --text:#222;
+    --primary:#007bff;
+    --secondary:#28a745;
+    --danger:#007bff;
+    --shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.dark{
+    --bg:#2f2e2e;
+    --card:#000000;
+    --text:#ffffff;
+    --primary:#007bff;
+    --secondary:#00d26a;
+    --danger:#007bff;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    transition:.3s;
+}
+
+.container{
+    width:100%;
+    max-width:550px;
+    background:var(--card);
+    padding:25px;
+    border-radius:20px;
+    box-shadow:var(--shadow);
+    margin:auto;
+}
+
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.top-bar{
+    display:flex;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+select,input,button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+}
+
+input,select{
+    background:#ececec;
+}
+
+.dark input,
+.dark select{
+    background:#2b2b2b;
+    color:white;
+}
+
+button{
+    cursor:pointer;
+    color:white;
+    font-weight:bold;
+}
+
+.calculate-btn{
+    background:var(--primary);
+}
+
+.clear-btn{
+    background:var(--danger);
+}
+
+.pdf-btn{
+    background:var(--secondary);
+}
+
+.result{
+    margin-top:15px;
+    padding:15px;
+    border-radius:12px;
+    background:rgba(0,123,255,.1);
+    line-height:1.8;
+}
+
+.btn-group{
+    display:flex;
+    gap:10px;
+}
+
+.footer{
+    margin-top:15px;
+    text-align:center;
+    font-size:13px;
+    opacity:.8;
+}
+
+@media(max-width:600px){
+    .btn-group{
+        flex-direction:column;
+    }
+
+    .top-bar{
+        flex-direction:column;
+    }
+}
+@media(max-width:600px){
+
+body{
+    padding:10px;
+    align-items:flex-start;
+}
+
+.container{
+    padding:18px;
+    border-radius:15px;
+}
+
+h1{
+    font-size:22px;
+}
+
+.top-bar{
+    flex-direction:column;
+}
+
+.btn-group{
+    flex-direction:column;
+}
+
+input,
+select,
+button{
+    font-size:16px;
+    padding:14px;
+}
+
+.result{
+    font-size:15px;
+    padding:12px;
+}
+
+.footer{
+    font-size:12px;
+}
+}
+/* ========================================= */
+/* APPLE STYLE STARTUP SCREEN */
+/* ========================================= */
+
+#splash-screen{
+    position:fixed;
+    inset:0;
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:center;
+    align-items:center;
+
+    background:#000;
+
+    z-index:999999;
+}
+
+/* TOP & BOTTOM LINES */
+.splash-line{
+
+    width:800px;
+    height:1px;
+
+    margin:20px 0;
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(12, 110, 180, 0.8),
+        transparent
+    );
+
+    animation:lineGlow 2s ease-in-out infinite;
+}
+
+/* TITLE */
+.apple-logo-text{
+
+    font-size:3rem;
+    font-weight:100;
+    letter-spacing:8px;
+
+    color:white;
+
+    text-align:center;
+}
+
+/* TAGLINE */
+.splash-tagline{
+
+    margin-top:20px;
+
+    color:rgba(255, 255, 255, 0.7);
+
+    letter-spacing:3px;
+
+    font-size:14px;
+}
+
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .splash-line{
+        width:220px;
+    }
+
+    .apple-logo-text{
+        font-size:1.8rem;
+        letter-spacing:3px;
+    }
+
+    .splash-tagline{
+        font-size:12px;
+    }
+}
+      
+</style>
+</head>
+<body>
+<!-- SPLASH SCREEN -->
+<div id="splash-screen">
+
+    <div class="splash-line"></div>
+
+    <div class="apple-logo-text">
+        VELINO ECOSYSTEM
+    </div>
+
+    <div class="splash-line"></div>
+
+    <div class="splash-tagline">
+        Developed By Shiva Velishoju
+    </div>
+
+</div>
+
+<script>
+    window.addEventListener("load", () => {
+    
+        setTimeout(() => {
+    
+            const splash = document.getElementById("splash-screen");
+    
+            splash.classList.add("fade-out");
+    
+            setTimeout(() => {
+                splash.style.display = "none";
+            }, 800);
+    
+        }, 2500);
+    
+    });
+    </script>
+<div class="container">
+
+<h1 id="title">VADDI Calculator Pro</h1>
+
+<div class="top-bar">
+
+<select id="language" onchange="changeLanguage()">
+    <option value="en">English</option>
+    <option value="te">తెలుగు</option>
+</select>
+
+<button onclick="toggleTheme()" class="calculate-btn" id="themeBtn">
+    🌙 Theme
+    </button>
+</div>
+
+<select id="calcType">
+    <option value="si" id="siOption">Simple Interest</option>
+    <option value="ci" id="ciOption">Compound Interest</option>
+    <option value="emi" id="emiOption">EMI Calculator</option>
+</select>
+
+
+
+<input type="text" id="amount" placeholder="Principal Amount" oninput="formatAmount(this)">
+
+<input type="number" id="rate" placeholder="Interest Rate (%)">
+
+<input type="number" id="time" placeholder="Time (Months)">
+
+<div class="btn-group">
+
+<button class="calculate-btn" onclick="calculate()" id="calcBtn">
+Calculate
+</button>
+
+<button class="clear-btn" onclick="clearFields()" id="clearBtn">
+    Clear
+    </button>
+    
+
+</div>
+
+<div class="result" id="result">
+Results will appear here...
+</div>
+
+<button class="pdf-btn" onclick="downloadPDF()" id="pdfBtn">
+    📄 Download PDF Report
+    </button>
+    
+    <div class="footer" id="footerText">
+        VELINO VADDI Calculator Pro
+        </div>
+
+
+</div>
+
+<script>
+
+let reportText="";
+
+const translations = {
+en:{
+title:"VADDI Calculator Pro",
+amount:"Principal Amount",
+rate:"Interest Rate (%)",
+time:"Duration",
+calculate:"Calculate",
+clear:"Clear",
+download:"📄 Download PDF Report",
+simpleInterest:"Simple Interest",
+compoundInterest:"Compound Interest",
+emi:"EMI Calculator",
+footer:"VELINO VADDI Calculator Pro",
+theme:"🌙 Theme",
+light:"☀️ Light Mode",
+waiting:"Results will appear here..."
+},
+
+te:{
+title:"వెలినో వడ్డీ కాలిక్యులేటర్ ప్రో",
+amount:"మొత్తం",
+rate:"వడ్డీ రేటు (%)",
+time:"కాలం",
+calculate:"లెక్కించు",
+clear:"తొలగించు",
+download:"📄 PDF నివేదిక డౌన్‌లోడ్",
+simpleInterest:"సాధారణ వడ్డీ",
+compoundInterest:"చక్రవడ్డీ",
+emi:"ఈఎంఐ కాలిక్యులేటర్",
+footer:"వెలినో వడ్డీ కాలిక్యులేటర్ ప్రో",
+theme:"🌙 థీమ్",
+light:"☀️ లైట్ మోడ్",
+waiting:"ఫలితాలు ఇక్కడ కనిపిస్తాయి..."
+}
+};
+
+function formatAmount(input) {
+
+let value = input.value.replace(/[^\d]/g, '');
+
+if (value === '') {
+    input.value = '';
+    return;
+}
+
+let formatted = new Intl.NumberFormat('en-IN').format(value);
+
+input.value = '₹' + formatted;
+}
+
+function changeLanguage(){
+
+let lang = document.getElementById("language").value;
+
+document.getElementById("siOption").text =
+translations[lang].simpleInterest;
+
+document.getElementById("ciOption").text =
+translations[lang].compoundInterest;
+
+document.getElementById("emiOption").text =
+translations[lang].emi;
+
+document.getElementById("footerText").innerText =
+translations[lang].footer;
+
+document.getElementById("title").innerText =
+translations[lang].title;
+
+document.getElementById("amount").placeholder =
+translations[lang].amount;
+
+document.getElementById("rate").placeholder =
+translations[lang].rate;
+
+document.getElementById("time").placeholder =
+translations[lang].time;
+
+document.getElementById("calcBtn").innerText =
+translations[lang].calculate;
+
+document.getElementById("clearBtn").innerText =
+translations[lang].clear;
+
+document.getElementById("pdfBtn").innerText =
+translations[lang].download;
+
+document.getElementById("result").innerHTML =
+translations[lang].waiting;
+
+const themeBtn = document.getElementById("themeBtn");
+
+if(document.body.classList.contains("dark")){
+    themeBtn.innerText = translations[lang].light;
+}else{
+    themeBtn.innerText = translations[lang].theme;
+}
+
+
+document.getElementById("result").innerHTML =
+translations[lang].waiting;
+}
+function toggleTheme(){
+document.body.classList.toggle("dark");
+}
+
+
+function formatINR(num){
+return "Rs. " + new Intl.NumberFormat('en-IN').format(num);
+
+}
+
+
+function calculate(){
+
+let type=document.getElementById("calcType").value;
+
+let P=parseFloat(
+    
+document.getElementById("amount").value
+.replace(/₹/g,'')
+.replace(/,/g,'')
+);
+let R=parseFloat(document.getElementById("rate").value);
+let T=parseFloat(document.getElementById("time").value);
+
+if(isNaN(P)||isNaN(R)||isNaN(T)){
+alert("Please enter all values");
+return;
+}
+
+let resultHTML="";
+
+if(type==="si"){
+
+    let interest=(P*R*T)/100;
+let total=P+interest;
+
+const lang = document.getElementById("language").value;
+
+
+if(lang === "te"){
+
+resultHTML=`
+<h3>సాధారణ వడ్డీ</h3>
+<p><b>మొత్తం:</b> ${formatINR(P)}</p>
+<p><b>వడ్డీ:</b> ${formatINR(interest)}</p>
+<p><b>మొత్తం చెల్లించవలసినది:</b> ${formatINR(total)}</p>
+`;
+
+}else{
+
+resultHTML=`
+<h3>Simple Interest</h3>
+<p><b>Principal:</b> ${formatINR(P)}</p>
+<p><b>Interest:</b> ${formatINR(interest)}</p>
+<p><b>Total Amount:</b> ${formatINR(total)}</p>
+`;
+
+}
+reportText=`
+Simple Interest Report
+
+Principal : ${formatINR(P)}
+Rate : ${R}%
+Time : ${T} months
+
+Interest : ${formatINR(interest)}
+Total Amount : ${formatINR(total)}
+`;
+
+}
+else if(type==="ci"){
+
+let total = P * Math.pow((1 + R/100), T);
+let interest = total - P;
+
+const lang = document.getElementById("language").value;
+
+if(lang === "te"){
+
+resultHTML = `
+<h3>చక్రవడ్డీ</h3>
+<p><b>మొత్తం:</b> ${formatINR(P)}</p>
+<p><b>వడ్డీ:</b> ${formatINR(interest)}</p>
+<p><b>మొత్తం చెల్లించవలసినది:</b> ${formatINR(total)}</p>
+`;
+
+}else{
+
+resultHTML = `
+<h3>Compound Interest</h3>
+<p><b>Principal:</b> ${formatINR(P)}</p>
+<p><b>Interest:</b> ${formatINR(interest)}</p>
+<p><b>Total Amount:</b> ${formatINR(total)}</p>
+`;
+
+}
+
+reportText = `
+Compound Interest Report
+
+Principal : ${formatINR(P)}
+Rate : ${R}%
+Time : ${T} Months
+
+Interest : ${formatINR(interest)}
+Total Amount : ${formatINR(total)}
+`;
+
+}
+
+else{
+
+let months = T; // Time already entered in months
+let monthlyRate = R / (12 * 100);
+
+let emi =
+(P * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+(Math.pow(1 + monthlyRate, months) - 1);
+
+let total = emi * months;
+let interest = total - P;
+
+const lang = document.getElementById("language").value;
+
+if(lang === "te"){
+
+resultHTML = `
+<h3>ఈఎంఐ కాలిక్యులేటర్</h3>
+<p><b>రుణ మొత్తం:</b> ${formatINR(P)}</p>
+<p><b>నెలవారీ EMI:</b> ${formatINR(emi)}</p>
+<p><b>మొత్తం వడ్డీ:</b> ${formatINR(interest)}</p>
+<p><b>మొత్తం చెల్లింపు:</b> ${formatINR(total)}</p>
+`;
+
+}else{
+
+resultHTML = `
+<h3>EMI Calculator</h3>
+<p><b>Loan Amount:</b> ${formatINR(P)}</p>
+<p><b>Monthly EMI:</b> ${formatINR(emi)}</p>
+<p><b>Total Interest:</b> ${formatINR(interest)}</p>
+<p><b>Total Payment:</b> ${formatINR(total)}</p>
+`;
+
+}
+
+reportText = `
+EMI Report
+
+Loan Amount : ${formatINR(P)}
+Rate : ${R}%
+Time : ${T} Months
+
+Monthly EMI : ${formatINR(emi)}
+Total Interest : ${formatINR(interest)}
+Total Payment : ${formatINR(total)}
+`;
+
+
+
+}
+
+document.getElementById("result").innerHTML=resultHTML;
+}
+
+function clearFields(){
+
+document.getElementById("amount").value="";
+document.getElementById("rate").value="";
+document.getElementById("time").value="";
+
+document.getElementById("result").innerHTML=
+"Results will appear here...";
+
+reportText="";
+}
+
+
+
+async function downloadPDF(){
+
+if(reportText===""){
+    alert("Please calculate first");
+    return;
+}
+
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+
+const lang = document.getElementById("language").value;
+
+let type = document.getElementById("calcType").value;
+
+if(lang === "te"){
+    if(type === "si") type = "Simple Interest";
+    else if(type === "ci") type = "Compound Interest";
+    else if(type === "emi") type = "EMI Calculator";
+} else {
+    if(type === "si") type = "Simple Interest";
+    else if(type === "ci") type = "Compound Interest";
+    else if(type === "emi") type = "EMI Calculator";
+}
+const P = parseFloat(
+document.getElementById("amount").value
+.replace(/[^\d.]/g,'')
+);
+
+const amount =
+"Rs. " + new Intl.NumberFormat('en-IN').format(P);
+const rate = document.getElementById("rate").value;
+const time = document.getElementById("time").value;
+
+const date = new Date().toLocaleString();
+
+doc.setFillColor(0,123,255);
+doc.rect(0,0,210,25,"F");
+
+doc.setTextColor(255,255,255);
+doc.setFontSize(20);
+doc.text("VADDI Calculator",105,15,{align:"center"});
+
+doc.setTextColor(0,0,0);
+
+doc.setFontSize(11);
+doc.text("Generated: " + date,14,35);
+
+doc.setDrawColor(0,123,255);
+doc.roundedRect(10,45,190,145,3,3);
+
+doc.setFontSize(14);
+doc.setTextColor(0,123,255);
+doc.text("Calculation Details",14,55);
+
+doc.setTextColor(0,0,0);
+doc.setFontSize(12);
+
+doc.text("Calculator Type :",14,70);
+doc.text(type,80,70);
+
+doc.text("Principal Amount :",14,82);
+doc.text(amount,80,82);
+
+doc.text("Interest Rate :",14,94);
+doc.text(rate + " %",80,94);
+
+doc.text("Time Period :",14,106);
+doc.text(time + " Months",80,106);
+
+let resultText = reportText;
+
+const lines = doc.splitTextToSize(resultText,170);
+
+doc.setFontSize(14);
+doc.setTextColor(40,167,69);
+doc.text("Result",14,125);
+
+doc.setTextColor(0,0,0);
+
+doc.text(lines,14,135);
+
+doc.setFontSize(10);
+doc.setTextColor(120);
+
+doc.text(
+"Generated by VADDI Calculator Pro",
+105,
+285,
+{align:"center"}
+);
+
+doc.save("Interest_Report.pdf");
+}
+</script>
+
+</body>
+</html>
